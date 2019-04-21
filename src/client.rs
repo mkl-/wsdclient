@@ -1,17 +1,20 @@
 use serde::{Serialize, Deserialize};
-use crate::options::PlotParameters;
+use crate::types::{PlotParameters, DiagramError};
 
 use std::error::Error;
-use crate::options::WSDEnum;
+use crate::types::WSDEnum;
 
 // Represent response from websequence diagram website
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct WebSequenceDiagramResponse {
     img: String,
-    errors: Vec<String>, // TODO(mkl): add aditional fields
+    errors: Vec<String>,
+
+    // TODO(mkl): add aditional fields
 }
 
-pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<Vec<u8>, Box<Error>> {
+// it can plot diagrams even if there are errors
+pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<(Vec<u8>, Vec<DiagramError>), Box<Error>> {
     // TODO(mkl): correct handling of incorrect API key
     // if send request for pdf but key is incorrect png in returned
     let mut params = vec![
@@ -57,6 +60,7 @@ pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<Vec<u8>, B
             match serde_json::from_reader(&v[..]) {
                 Ok(r) => r,
                 Err(err) => {
+                    // TODO(mkl): refactor this
                     println!(
                         "Error deserializing websequencegiagram response: {:?}",
                         &err
@@ -87,5 +91,18 @@ pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<Vec<u8>, B
     let mut data = vec![];
     // copy the response body directly to stdout
     std::io::copy(&mut resp2, &mut data).unwrap();
-    Ok(data)
+
+    let errors_parsed = wr.errors
+        .iter()
+        .map(|error| DiagramError::from_wsd_error_str(error));
+    let mut errors = vec![];
+    for error in errors_parsed {
+        match error {
+            Ok(error) => errors.push(error),
+            Err(err) => return Err(format!("cannot parse error message: {:?}", err).into())
+        }
+    }
+
+
+    Ok((data, errors))
 }

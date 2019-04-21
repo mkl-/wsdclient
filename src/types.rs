@@ -1,6 +1,10 @@
 use serde::{Serialize, Deserialize};
 
+use regex::Regex;
+
 use std::error::Error;
+
+use std::str::FromStr;
 
 fn normalise_str(s: &str) -> String {
     s.to_lowercase().replace("-", "").replace("_", "")
@@ -259,4 +263,104 @@ impl Default for PlotParameters {
             api_key: None,
         }
     }
+}
+
+// Represent an error during diagram creation
+// Example of errors from API:
+// "Line 1: Syntax error."
+// "Line 3: Deactivate: A was not activated."
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DiagramError {
+    // Parsed description
+    pub description: String,
+
+    // line where the error occurred
+    pub line_number: i32,
+
+    // description as returned from website
+    pub raw_description: String,
+}
+
+impl DiagramError {
+    // "Line 1: Syntax error."
+    pub fn from_wsd_error_str(error: &str) -> Result<DiagramError, Box<Error>> {
+        // TODO(mkl): maybe use lazy_static ?
+        let re = Regex::new(r"(?ix)
+\s*Line\s+
+(?P<line_number>\d+)  # the line number
+\s* : \s*
+(?P<description>.*) # the description
+")?;
+
+        let caps = if let Some(caps) = re.captures(error) {
+            caps
+        } else {
+            return Err("Error parsing error response.".into())
+        };
+        println!("caps={:?}", caps);
+        let line_number = if let Some(line_number_match) = caps.name("line_number"){
+            match  i32::from_str(line_number_match.as_str()) {
+                Ok(x) => x,
+                Err(err) => return Err(format!("Error parsing error response. Cannot convert line_number into int: {} . String: `{}`", err, line_number_match.as_str()).into()),
+            }
+        } else {
+            return Err("Error parsing error response. Group `line_number` not found".into())
+        };
+
+        let description = if let Some(description_match) = caps.name("description") {
+            description_match.as_str().to_owned()
+        } else {
+            return Err("Error parsing error response. Group `description` not found".into())
+        };
+        Ok(DiagramError {
+            line_number,
+            description,
+            raw_description: error.to_owned()
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::types::DiagramError;
+
+    #[test]
+    fn from_wsd_error_1_test() {
+        match DiagramError::from_wsd_error_str("Line 1: Syntax error.") {
+            Ok(rez) => {
+                assert_eq!(
+                    rez,
+                    DiagramError {
+                        line_number: 1,
+                        description: "Syntax error.".to_owned(),
+                        raw_description: "Line 1: Syntax error.".to_owned()
+                    }
+                );
+            },
+            Err(err) => {
+                panic!("Result expected. Instead got an error: {}", err);
+            }
+        }
+    }
+
+    #[test]
+    fn from_wsd_error_2_test() {
+        match DiagramError::from_wsd_error_str("Line 3: Deactivate: A was not activated.") {
+            Ok(rez) => {
+                assert_eq!(
+                    rez,
+                    DiagramError {
+                        line_number: 3,
+                        description: "Deactivate: A was not activated.".to_owned(),
+                        raw_description: "Line 3: Deactivate: A was not activated.".to_owned()
+                    }
+                );
+            },
+            Err(err) => {
+                panic!("Result expected. Instead got an error: {}", err);
+            }
+        }
+    }
+
+
 }

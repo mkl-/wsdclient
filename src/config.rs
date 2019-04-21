@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 use clap::{App, Arg, AppSettings, SubCommand};
 
-use crate::options::{WSDEnum, Format, Style, PaperSize, PaperOrientation, PlotParameters};
+use crate::types::{WSDEnum, Format, Style, PaperSize, PaperOrientation, PlotParameters};
 
 fn split_list(s: Option<&str>) -> Vec<String> {
     match s {

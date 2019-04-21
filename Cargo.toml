@@ -10,3 +10,4 @@ clap = "2.33.0"
 serde = { version = "1.0.90", features = ["derive"] }
 serde_json = "*"
 reqwest = "0.9.14"
+regex = "1"
