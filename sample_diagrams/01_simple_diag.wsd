@@ -1,0 +1,8 @@
+A->B: text
+
+A-->B: text
+A->+B: text
+
+B-->-A: text
+
+A->A: text
