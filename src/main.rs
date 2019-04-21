@@ -6,7 +6,8 @@ use std::fs::File;
 use std::io::{Read, Write};
 
 fn main() {
-    // TODO(mkl): add option to treat all errors/warning as fatal
+    // TODO(mkl): add option to treat all errors/warnings as fatal
+    // TODO(mkl): add option to print requests and responses
     // TODO(mkl): do not use unwrap
     let config = Config::from_command_line();
 
@@ -25,7 +26,7 @@ fn main() {
         let lines = diagram_str.split("\n").collect::<Vec<&str>>();
         // There is a bug in websequencediagrams
         // if file starts with empty strings
-        // error indexes are less by 1 then needed
+        // error indexes are less by 1
         let delta =  if has_empty_lines_at_begining(&lines){
             1
         } else {

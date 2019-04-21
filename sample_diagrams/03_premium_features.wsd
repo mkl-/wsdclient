@@ -1,0 +1,6 @@
+state over A: Initial state
+
+parallel {
+    A->B: signal 1
+    B->C: signal2
+}
