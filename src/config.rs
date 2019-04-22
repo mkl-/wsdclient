@@ -29,7 +29,7 @@ impl Config {
             // TODO(mkl): match versions in toml file and here
             .version("0.0.0")
             .author("Mykola Sakhno <mykola.sakhno@bitfury.com>")
-            .about("wsdclient is a tool for creating diagrams from their textual representation using websequencediagrams public API")
+            .about("wsdclient is a tool for creating diagrams from their textual representation using websequencediagrams public API. Note: errors are not fatal by default.")
             .arg(
                 Arg::with_name("input-file")
                     .help("set the input file to use. If not specified STDIN is read.")
