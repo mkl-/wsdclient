@@ -26,8 +26,7 @@ impl Config {
     // TODO(mkl): add verbose option. Like write request and response to website
     pub fn from_command_line() -> Config {
         let matches = App::new("wsdclient")
-            // TODO(mkl): match versions in toml file and here
-            .version("0.0.0")
+            .version(option_env!("CARGO_PKG_VERSION").unwrap_or("<version unknown>"))
             .author("Mykola Sakhno <mykola.sakhno@bitfury.com>")
             .about("wsdclient is a tool for creating diagrams from their textual representation using websequencediagrams public API. Note: errors are not fatal by default.")
             .arg(

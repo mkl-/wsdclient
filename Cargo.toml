@@ -1,6 +1,6 @@
 [package]
 name = "wsdclient"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["Mykola Sakhno <mykola.sakhno@bitfury.com>"]
 edition = "2018"
 
