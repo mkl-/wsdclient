@@ -103,7 +103,6 @@ pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<WSDResult,
     }
 
     let mut data = vec![];
-    // copy the response body directly to stdout
     std::io::copy(&mut second_response, &mut data)
         .map_err(|err|
                      format!("Error reading diagram from {} : {:?}", second_request_url, err)
