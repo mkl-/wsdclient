@@ -8,7 +8,6 @@ use std::io::{Read, Write};
 use std::error::Error;
 
 fn main() -> Result<(), Box<Error>> {
-    // TODO(mkl): add option to treat all errors/warnings as fatal
     // TODO(mkl): add option to print requests and responses
     let config = Config::from_command_line();
 
@@ -29,7 +28,12 @@ fn main() -> Result<(), Box<Error>> {
         .map_err(|err| format!("error getting diagram: {:?}", err))?;
 
     if result.actual_format != config.plot_parameters.format {
-        println!("WARNING: Actual format `{}` is different from requested format `{}`\nMaybe you do not provide correct api_key for premium features (like pdf or svg formats)", result.actual_format.wsd_value(), config.plot_parameters.format.wsd_value());
+        let error_msg = format!("WARNING: Actual format `{}` is different from requested format `{}`\nMaybe you do not provide correct api_key for premium features (like pdf or svg formats)", result.actual_format.wsd_value(), config.plot_parameters.format.wsd_value());
+        if config.is_errors_fatal {
+            return Err(error_msg.into())
+        } else {
+            eprintln!("{}", error_msg);
+        }
     }
 
     if !result.errors.is_empty() {
@@ -42,13 +46,16 @@ fn main() -> Result<(), Box<Error>> {
         } else {
             0
         };
-        for error in result.errors {
+        for error in &result.errors {
             // TODO(mkl): should I use stderr or stdout ?
             // TODO(mkl): add check if line_numbers are sane
             let inp_file_name = config.input_file.clone().unwrap_or("<STDIN>".to_owned());
             let line_number = error.line_number + delta;
-            println!("{}:{} : {}", inp_file_name, line_number, error.description);
-            println!("{}\n", lines[(line_number-1) as usize])
+            eprintln!("{}:{} : {}", inp_file_name, line_number, error.description);
+            eprintln!("{}\n", lines[(line_number-1) as usize])
+        }
+        if config.is_errors_fatal {
+            return Err(format!("Number of errors in diagram: {}. Exiting.", result.errors.len()).into())
         }
     }
 

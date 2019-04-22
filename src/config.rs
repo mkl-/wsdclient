@@ -16,6 +16,7 @@ pub struct Config {
     pub input_file: Option<String>,
     pub output_file: String,
     pub plot_parameters: PlotParameters,
+    pub is_errors_fatal: bool
 }
 
 
@@ -77,6 +78,11 @@ impl Config {
                     .help("Scale. Default value is 100. High res is 200. It seems it only useful for png format. By default it is not included into request.")
                     .long("scale")
                     .takes_value(true)
+            )
+            .arg(
+                Arg::with_name("errors-fatal")
+                    .help("Treat all errors as fatal. By default some errors: like incorrect lines in diagram are ignored")
+                    .long("errors-fatal")
             )
             .get_matches();
 
@@ -175,6 +181,8 @@ impl Config {
                     None
                 };
 
+            let is_errors_fatal = matches.occurrences_of("errors-fatal") > 0;
+
             let plot_parameters = PlotParameters {
                 style,
                 format,
@@ -187,6 +195,7 @@ impl Config {
                 input_file,
                 output_file,
                 plot_parameters,
+                is_errors_fatal
             }
         }
     }
