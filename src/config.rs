@@ -23,7 +23,6 @@ pub struct Config {
 impl Config {
     // TODO(mkl): add function for exporting app and args
     // TODO(mkl): add function for parsing command line
-    // TODO(mkl): make sure if input file not specified read input from stdin
     // TODO(mkl): add verbose option. Like write request and response to website
     pub fn from_command_line() -> Config {
         let matches = App::new("wsdclient")

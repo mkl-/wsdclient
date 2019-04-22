@@ -33,7 +33,6 @@ pub struct WSDResult {
 
 // it can plot diagrams even if there are errors
 pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<WSDResult, Box<Error>> {
-    // TODO(mkl): correct handling of incorrect API key
     // if send request for pdf but key is incorrect png in returned
     let mut params = vec![
         ("message".to_owned(), spec.to_owned()),

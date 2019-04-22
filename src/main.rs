@@ -4,7 +4,7 @@ use wsdclient::config::Config;
 use crate::wsdclient::types::WSDEnum;
 use wsdclient::client::get_diagram;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::{Read, Write, stdin};
 use std::error::Error;
 
 fn main() -> Result<(), Box<Error>> {
@@ -18,12 +18,12 @@ fn main() -> Result<(), Box<Error>> {
             .read_to_end(&mut diagram)
             .map_err(|err| format!("error reading input file {} : {:?}", input_file, err))?;
     } else {
-        // TODO(mkl): add support for STDIN
-        unimplemented!("reading from STDIN is not supported");
+        stdin()
+            .read_to_end(& mut diagram)
+            .map_err(|err| format!("error reading from STDIN: {:?}", err))?;
     }
 
     let diagram_str = String::from_utf8_lossy(&diagram[..]);
-
     let result = get_diagram(&diagram_str, &config.plot_parameters)
         .map_err(|err| format!("error getting diagram: {:?}", err))?;
 
