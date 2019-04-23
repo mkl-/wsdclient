@@ -6,7 +6,7 @@ use std::error::Error;
 use crate::types::WSDEnum;
 
 // Represent response from websequence diagram website
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 struct WebSequenceDiagramResponse {
     img: String,
     errors: Vec<String>,
@@ -90,6 +90,9 @@ pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<WSDResult,
         }
     }?;
 
+    let actual_format = determine_actual_format(&first_response.img)
+        .map_err(|err| format!("cannot determine actual format from url: {} : {:?}", &first_response.img, err))?;
+
     let second_request_url = format!("http://www.websequencediagrams.com/index.php{}", first_response.img);
     // Second request contains actual diagram
     let mut second_response = reqwest::Client::new()
@@ -121,7 +124,7 @@ pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<WSDResult,
     Ok(WSDResult {
         diagram: data,
         errors,
-        actual_format: Default::default(),
+        actual_format,
     })
 }
 

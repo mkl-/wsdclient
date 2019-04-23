@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<Error>> {
     }
 
     if !result.errors.is_empty() {
-        let lines = diagram_str.split("\n").collect::<Vec<&str>>();
+        let lines = diagram_str.split('\n').collect::<Vec<&str>>();
         // There is a bug in websequencediagrams
         // if file starts with empty strings
         // error indexes are less by 1
@@ -48,9 +48,9 @@ fn main() -> Result<(), Box<Error>> {
             0
         };
         for error in &result.errors {
-            let inp_file_name = config.input_file.clone().unwrap_or("<STDIN>".to_owned());
+            let inp_file_name = config.input_file.clone().unwrap_or_else(||"<STDIN>".to_owned());
             let line_number = error.line_number + delta;
-            if line_number - 1 >= (lines.len() as i32) || line_number - 1 < 0 {
+            if line_number  > (lines.len() as i32) || line_number  < 1 {
                 return Err(format!("incorect resulting error line number: {}. Number of lines in input: {}", line_number, lines.len()).into())
             }
             eprintln!("{}:{} : {}", inp_file_name, line_number, error.description);
@@ -76,6 +76,6 @@ fn is_empty(s: &str) -> bool {
         .is_empty()
 }
 
-fn has_empty_lines_at_begining(lines: &Vec<&str>) -> bool {
+fn has_empty_lines_at_begining(lines: &[&str]) -> bool {
     !lines.is_empty() && is_empty(lines[0])
 }

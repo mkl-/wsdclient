@@ -1,19 +1,13 @@
 use serde::{Serialize, Deserialize};
 
-use clap::{App, Arg, AppSettings, SubCommand};
+use clap::{App, Arg};
 
 use crate::types::{WSDEnum, Format, Style, PaperSize, PaperOrientation, PlotParameters};
 
 use std::error::Error;
 
-fn split_list(s: Option<&str>) -> Vec<String> {
-    match s {
-        Some(s) => s.split(',').map(ToOwned::to_owned).collect(),
-        None => vec![],
-    }
-}
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Config {
     pub input_file: Option<String>,
     pub output_file: String,

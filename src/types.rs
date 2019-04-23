@@ -58,7 +58,7 @@ pub trait WSDEnum
 }
 
 // represent output format. Note: some formats (Pdf, Svg) are premium features
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Format {
     Png,
     Pdf,
@@ -107,7 +107,7 @@ impl WSDEnum for Format {
 //qsd
 //rose
 //roundgreen
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Style {
     Default,
     Earth,
@@ -159,7 +159,7 @@ impl WSDEnum for Style {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaperSize {
     None,
     Letter,
@@ -203,7 +203,7 @@ impl WSDEnum for PaperSize {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaperOrientation {
     Portrait,
     Landscape,
@@ -243,7 +243,7 @@ impl WSDEnum for PaperOrientation {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PlotParameters {
     pub style: Style,
     pub format: Format,
