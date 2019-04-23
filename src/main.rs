@@ -48,10 +48,11 @@ fn main() -> Result<(), Box<Error>> {
             0
         };
         for error in &result.errors {
-            // TODO(mkl): should I use stderr or stdout ?
-            // TODO(mkl): add check if line_numbers are sane
             let inp_file_name = config.input_file.clone().unwrap_or("<STDIN>".to_owned());
             let line_number = error.line_number + delta;
+            if line_number - 1 >= (lines.len() as i32) || line_number - 1 < 0 {
+                return Err(format!("incorect resulting error line number: {}. Number of lines in input: {}", line_number, lines.len()).into())
+            }
             eprintln!("{}:{} : {}", inp_file_name, line_number, error.description);
             eprintln!("{}\n", lines[(line_number-1) as usize])
         }

@@ -63,7 +63,6 @@ pub enum Format {
     Png,
     Pdf,
     Svg,
-    // TODO(mkl): High-res PNG ?
 }
 
 // By default PNG image is created
@@ -180,7 +179,8 @@ impl Default for PaperSize {
 
 impl WSDEnum for PaperSize {
     fn premium_feature(&self) -> bool {
-        // TODO(mkl): check if it is actually correct
+        // It seems paper size is not premium feature by itself.
+        // However it is only useful for pdf format which is premium feature.
         false
     }
 
@@ -217,7 +217,8 @@ impl Default for PaperOrientation {
 
 impl WSDEnum for PaperOrientation {
     fn premium_feature(&self) -> bool {
-        // TODO(mkl): check this
+        // It seems paper orientation is not premium feature by itself.
+        // However it is only useful for pdf format which is premium feature.
         false
     }
 
