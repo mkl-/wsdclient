@@ -9,7 +9,8 @@ use std::error::Error;
 
 fn main() -> Result<(), Box<Error>> {
     // TODO(mkl): add option to print requests and responses
-    let config = Config::from_command_line();
+    let config = Config::from_command_line()
+        .map_err(|err| format!("error parsing command line options: {:?}", err))?;
 
     let mut diagram: Vec<u8> = vec![];
     if let Some(ref input_file) = config.input_file {

@@ -297,7 +297,6 @@ impl DiagramError {
         } else {
             return Err("Error parsing error response.".into())
         };
-        println!("caps={:?}", caps);
         let line_number = if let Some(line_number_match) = caps.name("line_number"){
             match  i32::from_str(line_number_match.as_str()) {
                 Ok(x) => x,

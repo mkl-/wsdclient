@@ -4,6 +4,8 @@ use clap::{App, Arg, AppSettings, SubCommand};
 
 use crate::types::{WSDEnum, Format, Style, PaperSize, PaperOrientation, PlotParameters};
 
+use std::error::Error;
+
 fn split_list(s: Option<&str>) -> Vec<String> {
     match s {
         Some(s) => s.split(',').map(ToOwned::to_owned).collect(),
@@ -24,7 +26,7 @@ impl Config {
     // TODO(mkl): add function for exporting app and args
     // TODO(mkl): add function for parsing command line
     // TODO(mkl): add verbose option. Like write request and response to website
-    pub fn from_command_line() -> Config {
+    pub fn from_command_line() -> Result<Config, Box<Error>> {
         let matches = App::new("wsdclient")
             .version(option_env!("CARGO_PKG_VERSION").unwrap_or("<version unknown>"))
             .author("Mykola Sakhno <mykola.sakhno@bitfury.com>")
@@ -97,13 +99,12 @@ impl Config {
                 if let Some(format_arg) = Format::from_str(format_arg_str) {
                     format = format_arg;
                 } else {
-                    println!(
-                        "ERROR: incorrect format value. Possible values are: {}. Got: {}",
+                    let error_msg = format!(
+                        "incorrect format value. Possible values are: {}. Got: {}",
                         Format::help_str(),
                         format_arg_str
                     );
-                    // TODO(mkl): use grace exit
-                    std::process::exit(1);
+                    return Err(error_msg.into());
                 }
             }
 
@@ -112,13 +113,12 @@ impl Config {
                 if let Some(style_arg) = Style::from_str(style_arg_str) {
                     style = style_arg;
                 } else {
-                    println!(
+                    let error_msg = format!(
                         "ERROR: incorrect style value. Possible values are: {}. Got: {}",
                         Style::help_str(),
                         style_arg_str
                     );
-                    // TODO(mkl): use grace exit
-                    std::process::exit(1);
+                    return Err(error_msg.into());
                 }
             }
 
@@ -127,13 +127,12 @@ impl Config {
                 if let Some(paper_size_arg) = PaperSize::from_str(paper_size_arg_str) {
                     paper_size = Some(paper_size_arg)
                 } else {
-                    println!(
+                    let error_msg = format!(
                         "ERROR: incorrect paper-size value. Possible values are: {}. Got: {}",
                         PaperSize::help_str(),
                         paper_size_arg_str
                     );
-                    // TODO(mkl): use grace exit
-                    std::process::exit(1);
+                    return Err(error_msg.into());
                 }
             }
 
@@ -144,9 +143,8 @@ impl Config {
                 {
                     paper_orientation = Some(paper_orientation_arg)
                 } else {
-                    println!("ERROR: incorrect paper-orientation value. Possible values are: {}. Got: {}", PaperOrientation::help_str(), paper_orientation_arg_str);
-                    // TODO(mkl): use grace exit
-                    std::process::exit(1);
+                    let error_msg = format!("ERROR: incorrect paper-orientation value. Possible values are: {}. Got: {}", PaperOrientation::help_str(), paper_orientation_arg_str);
+                    return Err(error_msg.into());
                 }
             }
 
@@ -156,12 +154,11 @@ impl Config {
                 if let Ok(scale_arg) = u32::from_str(scale_arg_str) {
                     scale = Some(scale_arg)
                 } else {
-                    println!(
-                        "ERROR: incorrect scale value. It shoulf be positive integer. Got: {}",
+                    let error_msg = format!(
+                        "ERROR: incorrect scale value. It should be positive integer. Got: {}",
                         scale_arg_str
                     );
-                    // TODO(mkl): use grace exit
-                    std::process::exit(1);
+                    return Err(error_msg.into());
                 }
             }
 
@@ -189,11 +186,11 @@ impl Config {
                 scale,
                 api_key,
             };
-            Config {
+            Ok(Config {
                 input_file,
                 output_file,
                 plot_parameters,
                 is_errors_fatal
-            }
+            })
         }
     }
