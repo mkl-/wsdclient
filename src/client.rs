@@ -14,24 +14,26 @@ struct WebSequenceDiagramResponse {
     // TODO(mkl): add aditional fields
 }
 
+
+/// Contains result of plotting diagram
 pub struct WSDResult {
-    // Content of the diagram
+    /// Content of the diagram
     pub diagram: Vec<u8>,
 
-    // Errors are not fatal. Even if there are errors
-    // rest lines may be plotted.
+    /// Vector with errors.
+    /// Errors are not fatal. Even if there are errors
+    /// rest lines may be plotted.
     pub errors: Vec<DiagramError>,
 
-    // Actual format may be different from requested. For example when pdf is requested
-    // but no api key are provided.
-    // Format is determined from returned url
-    // "?png=mscKTO107" for png
-    // "?pdf=mscKTO107" for pdf
-    // "?svg=mscKTO107" for svg
+    /// Actual format of the diagram
+    /// Actual format may be different from requested. For example when pdf is requested
+    /// but no api key are provided.
+    /// Format is determined from returned url
+    /// "?png=mscKTO107" for png
     pub actual_format: Format
 }
 
-// it can plot diagrams even if there are errors
+/// plot diagram using websequncediagrams public API
 pub fn get_diagram(spec: &str, parameters: &PlotParameters) -> Result<WSDResult, Box<Error>> {
     // if send request for pdf but key is incorrect png in returned
     let mut params = vec![

@@ -10,12 +10,18 @@ fn normalise_str(s: &str) -> String {
     s.to_lowercase().replace("-", "").replace("_", "")
 }
 
+/// Trait with useful methods for working with websequencediagrams (wsd) enums (style, ...).
 pub trait WSDEnum
     where
         Self: std::marker::Sized,
 {
+    /// is this value premium? Premium features requires correct API key
     fn premium_feature(&self) -> bool;
+
+    /// value used in request to API
     fn wsd_value(&self) -> String;
+
+    /// returns list of all values of type
     fn all() -> Vec<Self>;
 
     fn human_readable_value(&self) -> String {
@@ -57,7 +63,11 @@ pub trait WSDEnum
     }
 }
 
-// represent output format. Note: some formats (Pdf, Svg) are premium features
+/// represent output format. Note: some formats (Pdf, Svg) are premium features.
+///
+/// high-res png is png but with scale=200
+///
+/// Note: websequencediagram API may return result in other format then requested
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Format {
     Png,
@@ -96,17 +106,8 @@ impl WSDEnum for Format {
     }
 }
 
-//default
-//earth
-//magazine
-//modern-blue
-//mscgen
-//napkin
-//omegapple
-//patent
-//qsd
-//rose
-//roundgreen
+/// Represent style used to plot diagram. List of styles: default, earth, magazine,
+/// modern-blue, mscgen, napkin, omegapple, patent, qsd, rose, roundgreen
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Style {
     Default,
@@ -159,6 +160,7 @@ impl WSDEnum for Style {
     }
 }
 
+/// Represent paper size of result. Only useful with pdf output format.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaperSize {
     None,
@@ -203,6 +205,7 @@ impl WSDEnum for PaperSize {
     }
 }
 
+/// Represent paper orientation of output. Useful only with pdf output format
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaperOrientation {
     Portrait,
@@ -243,13 +246,25 @@ impl WSDEnum for PaperOrientation {
     }
 }
 
+/// represent parameters for plotting
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PlotParameters {
+    /// style to used. By default `default` style is used
     pub style: Style,
+
+    /// output format. By default `png` is used
     pub format: Format,
+
+    /// paper size of output. Only useful with pdf output format
     pub paper_size: Option<PaperSize>,
+
+    /// paper orientation of output. Only useful with pdf output format
     pub paper_orientation: Option<PaperOrientation>,
+
+    /// scale of output image. Useful with png output format. To obtain high-res png use scale=200
     pub scale: Option<u32>,
+
+    /// API key. Some features requires premium account.
     pub api_key: Option<String>,
 }
 
@@ -266,19 +281,25 @@ impl Default for PlotParameters {
     }
 }
 
-// Represent an error during diagram creation
-// Example of errors from API:
-// "Line 1: Syntax error."
-// "Line 3: Deactivate: A was not activated."
+/// Represent an error during diagram creation
+///
+/// Example of raw errors from API:
+///
+/// "Line 1: Syntax error."
+///
+/// "Line 3: Deactivate: A was not activated."
+///
+/// Errors may be not fatal. So you may still obtain diagram and errors at the same time.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DiagramError {
-    // Parsed description
+    /// Parsed description
     pub description: String,
 
-    // line where the error occurred
+    /// Line number where the error occurred. Note: it may be incorrect due to bug in API if
+    /// input starts from empty lines
     pub line_number: i32,
 
-    // description as returned from website
+    /// description returned from API
     pub raw_description: String,
 }
 

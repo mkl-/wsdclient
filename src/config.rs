@@ -6,12 +6,19 @@ use crate::types::{WSDEnum, Format, Style, PaperSize, PaperOrientation, PlotPara
 
 use std::error::Error;
 
-
+/// Represent configuration obtained from command line
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Config {
+    /// Name of the input file with diagram specification
+    /// If None - STDIN will be used
     pub input_file: Option<String>,
+
+    /// Name of the output file
     pub output_file: String,
+
     pub plot_parameters: PlotParameters,
+
+    /// Should errors be fatal. Like errors in diagram
     pub is_errors_fatal: bool
 }
 
@@ -20,6 +27,7 @@ impl Config {
     // TODO(mkl): add function for exporting app and args
     // TODO(mkl): add function for parsing command line
     // TODO(mkl): add verbose option. Like write request and response to website
+    /// Obtain program configuration from command line
     pub fn from_command_line() -> Result<Config, Box<Error>> {
         let matches = App::new("wsdclient")
             .version(option_env!("CARGO_PKG_VERSION").unwrap_or("<version unknown>"))
