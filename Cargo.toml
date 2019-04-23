@@ -8,6 +8,7 @@ repository = "https://github.com/mkl-/wsdclient"
 keywords = ["WebSequenceDiagrams", "API"]
 categories = ["api-bindings", "command-line-utilities"]
 license = "MIT"
+readme = "README.md"
 
 [dependencies]
 clap = "2"
